@@ -1,0 +1,8 @@
+compile sdsprpcd:
+
+aarch64-linux-gnu-gcc -DPREFIX=\"/slpi\" sdsprpcd.c fastrpc.c -pthread -o sdsprpcd
+
+you need the files slpi is looking for under PREFIX, from the android filesystem:
+ /mnt/vendor/persist/sensors
+ /vendor/etc/sensors
+ /sys/devices/soc0
