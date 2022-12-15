@@ -64,7 +64,7 @@ static void* listener_thread(void *arg)
 
       uint32_t sc = msg_recv[2];
 
-      // printf("handle invoke: sc=%.8x %.8x\n", sc, handle);
+      printf("handle invoke: sc=%.8x %.8x\n", sc, handle);
 
       unsigned inbufs = sc >> 16 & 0xff;
       unsigned outbufs = sc >> 8 & 0xff;
@@ -76,7 +76,7 @@ static void* listener_thread(void *arg)
          args[i].ptr = ptr; ptr += args[i].len;
 
          /* note: real lengths come from arg[0] dword array */
-         // printf("  inbuf %d: %d %.*s\n", i, args[i].len, args[i].len, args[i].ptr);
+         printf("  inbuf %d: %d %.*s\n", i, args[i].len, args[i].len, args[i].ptr);
       }
 
       void *ptr_out = out_buf;
@@ -87,7 +87,7 @@ static void* listener_thread(void *arg)
          ptr_out = (void*) (((size_t) ptr_out + 7) & ~7); /* align 8 */
          out_args[i].ptr = ptr_out; ptr_out += out_args[i].len;
 
-         // printf("  outbuf %d: %d\n", i, out_args[i].len);
+         printf("  outbuf %d: %d\n", i, out_args[i].len);
       }
       out_bufs_len = ptr_out - (void*) out_buf;
 
@@ -112,8 +112,8 @@ static void* listener_thread(void *arg)
          uint32_t rflags = args[0].ptr[2];
          uint64_t vin = *(uint64_t*) &args[0].ptr[4];
          uint64_t len = *(uint64_t*) &args[0].ptr[6];
-         //printf("map64 %.8x %.8x %.8x %.16lx %.16lx\n",
-         //       heapid, lflags, rflags, vin, len);
+         printf("map64 %.8x %.8x %.8x %.16lx %.16lx\n",
+                heapid, lflags, rflags, vin, len);
 #define ADSP_MMAP_ADD_PAGES   0x1000
          assert(rflags == ADSP_MMAP_ADD_PAGES);
 
@@ -140,6 +140,7 @@ static void* listener_thread(void *arg)
          char path[256];
          sprintf(path, PREFIX "%s", args[3].ptr);
 #endif
+	 printf("Requested path: %s\n", path);
          r = open(path, O_RDONLY); /* OK to assume null terminated string? */
          if (r >= 0) {
             out_args[0].ptr[0] = APPS_FD_BASE + r;
@@ -257,6 +258,7 @@ int listener_create(int fd)
    });
    assert(!ret);
 
+   printf("listener create\n");
    pthread_t thread;
    pthread_create(&thread, NULL, listener_thread, (void*) (size_t) fd);
 
@@ -310,6 +312,7 @@ int user_pd_create(int rpc_fd, bool unsigned_pd)
 int remotectl_open(int fd, const char *name, uint32_t name_len, uint32_t *handle,
                    char *dlerror, uint32_t dlerror_len, int *err)
 {
+   printf("remotectl_open\n");
    uint32_t out[2];
    int ret = ioctl(fd, FASTRPC_IOCTL_INVOKE, &(struct fastrpc_invoke) {
       .handle = FASTRPC_STATIC_HANDLE_REMOTECTL,

@@ -19,14 +19,18 @@ int main(void)
    int fd, ret;
    uint32_t handle;
 
-   fd = open("/dev/fastrpc-sdsp", O_RDONLY);
+   printf("HELLO\n");
+
+   fd = open("/dev/fastrpc-adsp", O_RDONLY);
    assert(fd >= 0);
 
    ret = ioctl(fd, FASTRPC_IOCTL_INIT_ATTACH_SNS);
    assert(!ret);
+   printf("atach_sns\n");
 
    ret = listener_create(fd);
    assert(!ret);
+   printf("listener_create\n");
 
    char error[255] = {};
    int err;
@@ -38,6 +42,7 @@ int main(void)
       .sc = 0,
    });
    assert(!ret);
+   printf("removectl_open called\n");
 
    /* let listener do its job */
    sleep(100);
